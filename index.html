@@ -1,37 +1,428 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Videos del taller</title>
-  <style>
-    :root { --fondo: #0f1117; --panel: #1a1d27; --texto: #eceef4; --suave: #9aa0b4; --acento: #f2b84b; }
-    @media (prefers-color-scheme: light) { :root { --fondo: #f5f4ef; --panel: #ffffff; --texto: #1b1d26; --suave: #5b6074; --acento: #b8791a; } }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--fondo); color: var(--texto); font-family: system-ui, "Segoe UI", sans-serif; }
-    main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; }
-    h1 { font-size: 1.5rem; margin: 0 0 4px; }
-    .sub { color: var(--suave); margin: 0 0 24px; }
-    .rejilla { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
-    article { background: var(--panel); border-radius: 14px; padding: 12px; }
-    video { width: 100%; aspect-ratio: 9 / 16; background: #000; border-radius: 10px; }
-    h2 { font-size: 1rem; margin: 10px 0 4px; }
-    p { margin: 0; color: var(--suave); font-size: 0.85rem; }
-    footer { margin-top: 32px; color: var(--suave); font-size: 0.8rem; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Galería del taller</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --panel2: #1e222b; --borde: #2a2f3b; --texto: #e8eaf0; --suave: #a1aabb;
+    --acento: #ff7a3c; --ok: #3ec97a; --medio: #f2b84a; --bajo: #e8604f; --radio: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--texto); font-family: "Segoe UI", system-ui, -apple-system, sans-serif; line-height: 1.45; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  a { color: var(--acento); }
+  header.top { position: sticky; top: 0; z-index: 20; background: rgba(15,17,21,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--borde); }
+  .top-in { max-width: 1280px; margin: 0 auto; padding: 14px 20px 0; }
+  h1 { font-size: 20px; margin: 0 0 2px; letter-spacing: -0.01em; }
+  .sub { color: var(--suave); font-size: 13px; margin: 0 0 10px; }
+  nav.tabs { display: flex; gap: 4px; overflow-x: auto; }
+  nav.tabs button { background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 14px; color: var(--suave); font-weight: 600; white-space: nowrap; }
+  nav.tabs button[aria-selected="true"] { color: var(--texto); border-bottom-color: var(--acento); }
+  nav.tabs button:focus-visible, .chip:focus-visible, .btn:focus-visible, .tarjeta:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  .badge-n { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 6px; border-radius: 999px; background: var(--acento); color: #1a1008; font-size: 12px; text-align: center; }
+  main { max-width: 1280px; margin: 0 auto; padding: 20px; }
+  .filtros { display: grid; gap: 10px; margin-bottom: 18px; }
+  .fila-f { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .fila-f .et { color: var(--suave); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; min-width: 72px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--borde); font-size: 13px; }
+  .chip[aria-pressed="true"] { background: var(--panel2); border-color: var(--acento); }
+  .punto { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+  .tarjeta { background: var(--panel); border: 1px solid var(--borde); border-radius: var(--radio); overflow: hidden; display: flex; flex-direction: column; text-align: left; padding: 0; }
+  .tarjeta:hover { border-color: #3a4152; }
+  .poster { position: relative; aspect-ratio: 9 / 16; background: #000; overflow: hidden; }
+  .poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .play { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(transparent 55%, rgba(0,0,0,0.0)); }
+  .play span { width: 54px; height: 54px; border-radius: 50%; background: rgba(0,0,0,0.55); border: 2px solid rgba(255,255,255,0.85); display: grid; place-items: center; }
+  .play span::after { content: ""; border-left: 16px solid #fff; border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 4px; }
+  .estrella { position: absolute; top: 10px; right: 10px; padding: 4px 9px; border-radius: 999px; background: var(--acento); color: #1a1008; font-size: 12px; font-weight: 700; }
+  .cuerpo { padding: 12px 14px 14px; display: grid; gap: 7px; }
+  .cuerpo h3 { margin: 0; font-size: 15px; line-height: 1.25; }
+  .cuenta { color: var(--suave); font-size: 12.5px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12px; background: var(--panel2); border: 1px solid var(--borde); max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .metricas { color: var(--suave); font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .fact { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+  .fact.alta { color: var(--ok); background: rgba(62,201,122,0.12); }
+  .fact.media { color: var(--medio); background: rgba(242,184,74,0.12); }
+  .fact.baja { color: var(--bajo); background: rgba(232,96,79,0.12); }
+  .vacio { color: var(--suave); padding: 40px 0; text-align: center; }
+  /* modal */
+  .velo { position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 50; display: none; overflow-y: auto; padding: 24px 16px; }
+  .velo.abierto { display: block; }
+  .modal { max-width: 1040px; margin: 0 auto; background: var(--panel); border: 1px solid var(--borde); border-radius: 18px; display: grid; grid-template-columns: minmax(240px, 400px) 1fr; gap: 0; overflow: hidden; }
+  .modal .izq { background: #000; display: flex; align-items: center; justify-content: center; }
+  .modal video { width: 100%; max-height: 86vh; aspect-ratio: 9/16; background: #000; display: block; }
+  .modal .der { padding: 22px 24px; display: grid; gap: 14px; align-content: start; max-height: 92vh; overflow-y: auto; }
+  .modal h2 { margin: 0; font-size: 21px; letter-spacing: -0.01em; }
+  .modal h4 { margin: 0 0 4px; font-size: 12px; color: var(--suave); text-transform: uppercase; letter-spacing: 0.06em; }
+  .modal p { margin: 0; font-size: 14.5px; }
+  .modal ul { margin: 0; padding-left: 18px; font-size: 14px; }
+  .cerrar { position: absolute; top: 16px; right: 20px; background: var(--panel2); border: 1px solid var(--borde); width: 38px; height: 38px; border-radius: 50%; font-size: 20px; line-height: 1; }
+  .acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn { background: var(--panel2); border: 1px solid var(--borde); padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: 14px; }
+  .btn.primario { background: var(--acento); border-color: var(--acento); color: #1a1008; }
+  .btn[aria-pressed="true"] { border-color: var(--acento); color: var(--acento); }
+  .btn.primario[aria-pressed="true"] { color: #1a1008; background: #ffb088; }
+  .plancha { width: 100%; border-radius: 10px; border: 1px solid var(--borde); display: block; }
+  .texto-mono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 12.5px; color: var(--suave); background: var(--panel2); border-radius: 10px; padding: 10px 12px; max-height: 120px; overflow-y: auto; }
+  textarea, input[type="text"] { width: 100%; background: var(--panel2); color: var(--texto); border: 1px solid var(--borde); border-radius: 10px; padding: 10px 12px; font: inherit; }
+  textarea { min-height: 96px; resize: vertical; }
+  .panel { background: var(--panel); border: 1px solid var(--borde); border-radius: var(--radio); padding: 18px; }
+  .dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  .estilo { display: grid; gap: 8px; }
+  .estilo h3 { margin: 0; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+  .estilo .id { font-weight: 800; color: var(--suave); font-size: 13px; }
+  .estilo p { margin: 0; font-size: 14px; }
+  .estilo .como { color: var(--suave); font-size: 13px; }
+  .mini { display: flex; gap: 6px; flex-wrap: wrap; }
+  .mini button { padding: 0; border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; width: 54px; aspect-ratio: 9/16; background: #000; }
+  .mini img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  h2.sec { font-size: 17px; margin: 26px 0 12px; }
+  h2.sec:first-child { margin-top: 0; }
+  .nota { color: var(--suave); font-size: 13px; }
+  .poster.h { aspect-ratio: 16 / 9; }
+  .modal.horiz { grid-template-columns: minmax(300px, 1.6fr) 1fr; }
+  .modal.horiz video { aspect-ratio: 16 / 9; max-height: 70vh; }
+  .voz { display: grid; gap: 10px; align-content: start; }
+  .voz h3 { margin: 0; font-size: 16px; }
+  .voz audio { width: 100%; }
+  .voz p { margin: 0; }
+  .grid-voz { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  @media (max-width: 760px) {
+    .modal { grid-template-columns: 1fr; }
+    .modal video { max-height: 60vh; }
+    .modal .der { max-height: none; }
+    main { padding: 14px; }
+  }
+</style>
 </head>
 <body>
-  <main>
-    <h1>Videos del taller</h1>
-    <p class="sub">Pruebas de video hechas con código e IA local. Toca uno para verlo.</p>
-    <div class="rejilla">
-      <article><video controls playsinline preload="none" poster="posters/video-1.jpg" src="videos/video-1.mp4"></video><h2>Glimmer Cape para supports (Dota 2)</h2><p>Animación 2D · 45 s</p></article>
-      <article><video controls playsinline preload="none" poster="posters/video-2.jpg" src="videos/video-2.mp4"></video><h2>Resumen: El Niño costero (12/11/2026)</h2><p>Animación plana con presentador · 30 s · datos del comunicado ENFEN N.° 19-2026</p></article>
-      <article><video controls playsinline preload="none" poster="posters/video-3.jpg" src="videos/video-3.mp4"></video><h2>¿Por qué en Lima hay tantos fierros saliendo de los techos?</h2><p>Explicativo 3D · 60 s</p></article>
-      <article><video controls playsinline preload="none" poster="posters/video-4.jpg" src="videos/video-4.mp4"></video><h2>Texto en movimiento (prueba)</h2><p>Primera prueba · 15 s · sin audio</p></article>
-    </div>
-    <footer>Pruebas de video hechas con código e IA local.</footer>
-  </main>
+<header class="top">
+  <div class="top-in">
+    <h1>Galería del taller de video</h1>
+    <p class="sub" id="sub"></p>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+  </div>
+</header>
+<main id="main"></main>
+<div class="velo" id="velo" role="dialog" aria-modal="true" aria-label="Detalle">
+  <div style="position: relative; max-width: 1040px; margin: 0 auto;">
+    <button class="cerrar" id="cerrar" aria-label="Cerrar">&times;</button>
+    <div class="modal" id="modal"></div>
+  </div>
+</div>
+
+<script id="datos" type="application/json">{"generado":"12/11/2026","visual":[{"id":"V1","nombre":"Diorama 3D explicativo","color":"#ff7a3c","desc":"Maqueta 3D en corte (casa, cocina, bodega) que se transforma mientras la voz explica. Cámara casi continua o con cortes por paso, subtítulos arriba, gráficos de datos abajo.","como":"Three.js dentro de HyperFrames + voz local (Kokoro) + tiempos por palabra (Parakeet). Ya hecho en M01-M04.","factibilidad":"alta","esfuerzo":"medio (una maqueta nueva por tema)"},{"id":"V2","nombre":"Muñecos 3D (diálogo o presentador)","color":"#ffc83c","desc":"Personajes low-poly o de cubos, tipo juego: conversan en un escenario (supermercado, bus, cabaña) o un presentador habla a cámara en una oficina con iconos que flotan. Muchos usan cámara en primera persona con manos en pantalla y lente ojo de pez; subtítulos con el nombre del que habla o la palabra clave resaltada.","como":"Three.js: muñecos armados con primitivas, boca que abre y cierra con los tiempos de cada palabra, cámara con fov amplio. Voces: Kokoro solo tiene 3 en español (em_alex, em_santa, ef_dora); se pueden variar con velocidad y tono.","factibilidad":"alta","esfuerzo":"medio-alto (personajes y escenarios por historia)"},{"id":"V3","nombre":"3D cinematográfico oscuro","color":"#b14a3a","desc":"Muñecos de bloques con luz dramática de velas y noche, planos cerrados de rostros, grano y borde de cámara. Subtítulos pequeños al pie.","como":"Three.js con luces cálidas, niebla y viñeta; las expresiones de rostro son el límite. Se puede acercar, pero con más trabajo de iluminación.","factibilidad":"media","esfuerzo":"alto"},{"id":"V4","nombre":"Ilustración 2D oscura tipo animación","color":"#4a76b8","desc":"Ilustraciones de personajes estilizados en azul noche, con pantallas de celular, alertas y datos como recurso narrativo, y pequeños movimientos de cámara sobre imagen fija.","como":"Requiere imágenes generadas: ComfyUI local (Flux/SDXL) cuando haya espacio en disco. La consistencia del personaje es el reto. Las pantallas de celular y los textos sí son nuestros (HTML).","factibilidad":"baja ahora","esfuerzo":"alto (depende de ComfyUI)"},{"id":"V5","nombre":"Cómic / novela gráfica con HUD de datos","color":"#3fa58a","desc":"Ilustraciones detalladas con contorno de tinta y paleta verde-naranja, cortes cada ~3 s, y paneles de datos superpuestos (contadores, \"DÍA 14\", \"DATO REAL\").","como":"Igual que V4 para las imágenes (ComfyUI). El HUD, los contadores y las etiquetas son HTML/GSAP: eso ya lo sabemos hacer.","factibilidad":"baja ahora","esfuerzo":"alto (depende de ComfyUI)"},{"id":"V6","nombre":"Explicativo vectorial plano con presentador","color":"#f2d9a0","desc":"Fondo crema tipo papel, íconos y tarjetas de interfaz que entran uno tras otro, un presentador caricaturesco abajo a la derecha y subtítulos arriba con la palabra clave en amarillo. Ritmo muy rápido.","como":"SVG/HTML + GSAP en HyperFrames (hay muchos bloques de tarjetas e íconos en su registro). Presentador dibujado en SVG con boca sincronizada.","factibilidad":"alta","esfuerzo":"bajo-medio"},{"id":"V7","nombre":"Tutorial en pantalla oscura","color":"#2fb36e","desc":"Modo oscuro con maquetas de celular, chats, código y tablas, llamadas numeradas (1, 2, 3) que señalan cada parte, y subtítulos arriba. Al final, una foto real.","como":"HTML puro: chats, JSON, tablas y círculos numerados con GSAP. HyperFrames trae bloques de chat y código.","factibilidad":"alta","esfuerzo":"bajo"},{"id":"V8","nombre":"Héroe 3D iluminado + fichas de expediente","color":"#e0b04a","desc":"Un objeto o figura 3D con luz dorada, o una celda de contención en 3D monocromo con cotas, láseres y contadores, más fichas de archivo con barras negras de censura que se llenan según avanza el relato.","como":"El objeto 3D necesita un modelo; con primitivas y luz se logra una versión abstracta. Las fichas son HTML.","factibilidad":"media","esfuerzo":"medio"},{"id":"V9","nombre":"3D low-poly estilo anime (PS1)","color":"#e0607a","desc":"Personajes 3D de baja resolución con caras de anime, texturas pixeladas y primeros planos muy cerrados en un escenario único (un ascensor). Subtítulos con tipografía pixel y música de fondo.","como":"Three.js con render a baja resolución y texturas pixeladas; lo difícil son los rostros expresivos. El escenario único y el diálogo son baratos.","factibilidad":"media","esfuerzo":"alto (rostros y animación de personajes)"},{"id":"V10","nombre":"Animación 2D vectorial (personaje o diagramas)","color":"#b07ad8","desc":"Motion graphics 2D de formas planas y paleta cerrada: un personaje de palitos que vive escenas con metáforas, o el corte transversal de un objeto cotidiano con cotas, etiquetas y líneas de tiempo. Mucho cambio de escena.","como":"SVG/HTML + GSAP en HyperFrames. Personaje y objetos dibujados en código; el diagrama animado de un objeto es la versión 2D de nuestros dioramas.","factibilidad":"alta","esfuerzo":"medio (muchas escenas e ilustraciones; los diagramas son fáciles)"},{"id":"V11","nombre":"Objeto 3D con interfaz HUD (showcase)","color":"#2fc4e0","desc":"Un objeto 3D (un producto, una pieza impresa) que la cámara recorre de cerca, con interfaz tipo holograma cian, etiquetas de componentes y titulares en mayúscula con la palabra clave resaltada.","como":"Three.js: importar el modelo (STL o GLB) o armarlo con primitivas; el HUD y las etiquetas son HTML. Con los STL de tu impresora 3D se puede mostrar el proyecto real.","factibilidad":"media","esfuerzo":"medio (preparar el modelo)"},{"id":"V12","nombre":"Infografía editorial de noticias","color":"#e8402a","desc":"Fondo claro con tipografía condensada negra y roja, tarjetas y ventanas de terminal que entran en secuencia, una cifra gigante, la fuente citada al pie, el nivel de gravedad en el encabezado y subtítulos en cajas oscuras. Unos 2 s por plano.","como":"HTML + GSAP en HyperFrames (tiene bloques de tarjetas, contadores y terminal). No necesita 3D ni imágenes generadas.","factibilidad":"alta","esfuerzo":"bajo"},{"id":"V13","nombre":"3D estilizado tipo peluche (personajes de diálogo)","color":"#f2a33a","desc":"Personajes 3D redondeados con aspecto de peluche o fieltro, con ojos grandes y expresivos, sobre escenarios de juguete muy coloridos. Cámara fija o con paneos suaves y planos de reacción cortos (unos 2,4 s).","como":"Three.js con las mismas primitivas redondeadas de V2 (esferas, cápsulas) y materiales mate; el diálogo va con la voz y la boca con movimiento simple. Personajes propios, no los de terceros.","factibilidad":"media","esfuerzo":"medio (armar los personajes una vez)"}],"narrativa":[{"id":"N1","nombre":"Explicativo de curiosidad","color":"#ff7a3c","desc":"Pregunta local → mecanismo explicado con objetos → remate con humor. Gancho alarmante en la primera frase.","como":"Ya dominado (M01-M04). Cada video con idea propia: encaja con la política de YouTube contra el contenido de plantilla.","ideal":"Educación, marca personal, canales de datos curiosos."},{"id":"N2","nombre":"Serie con decisión del público","color":"#ffc83c","desc":"\"PARTE n\" + cliffhanger + pantalla final \"¿Qué hacés?\" con 2 opciones y \"comentá…\". La opción más votada decide la siguiente parte.","como":"Guion en partes de 60-140 s; cada una termina en una decisión. Pide planificar varias ramas.","ideal":"Crecer comentarios y seguidores con ficción corta."},{"id":"N3","nombre":"Ficción seriada de terror o supervivencia","color":"#b14a3a","desc":"Capítulos con narrador en segunda persona (\"tú\") o diálogo, cliffhanger, tensión sostenida. Algunos cierran enviando a la película completa en YouTube.","como":"Guion serial + escenas. Cuidar la política de YouTube: cada capítulo con historia propia, no plantilla repetida.","ideal":"Retención y embudo hacia videos largos."},{"id":"N4","nombre":"Lore / expediente desclasificado","color":"#e0b04a","desc":"Narración como archivo secreto (clase, nivel, hallazgos), fichas con datos que se van revelando y barras negras de censura.","como":"Fichas en HTML + narración. Funciona con mundos de ficción propios.","ideal":"Misterio, ficción colaborativa, mundos inventados."},{"id":"N5","nombre":"Tutorial con gancho de beneficio y \"comenta X\"","color":"#2fb36e","desc":"Promesa de beneficio (\"gratis\", \"se hace solo\") → pasos o lista de recursos → \"comenta CLAUDE / BOT\" para recibir la guía, o al revés: \"link directo en la descripción, sin comentar\". Ritmo de 160-230 palabras por minuto.","como":"Pasos en pantalla + llamada a comentar. Ojo: la guía prometida hay que tenerla lista.","ideal":"Servicios, automatización, IA y negocio."},{"id":"N6","nombre":"Serie romántica o comedia por episodios","color":"#e0607a","desc":"Dos personajes atrapados en una situación (un ascensor) que se dicen verdades; episodio numerado, diálogo rápido, y un mensaje o giro final que deja ganas de ver el siguiente.","como":"Guion de diálogo por episodio y un cliffhanger. Necesita voces para dos personajes.","ideal":"Entretenimiento, crecer seguidores con series cortas."},{"id":"N7","nombre":"Psicología o autoayuda con personaje recurrente","color":"#b07ad8","desc":"Un personaje fijo vive el problema (flojera, perfeccionismo), se cita un estudio real y se dan pasos concretos. Cierra con un reto (\"30 días\") que se entrega al comentar.","como":"Guion de 4-7 minutos con metáforas visuales por idea; se puede acortar a 60 s. Conviene citar bien el estudio.","ideal":"Marca personal, formato largo para YouTube (el que mejor paga)."},{"id":"N8","nombre":"Mostrar un proyecto propio y pedir ideas","color":"#2fc4e0","desc":"Presentas la versión actual de un proyecto (con su historial de versiones), qué lleva por dentro, un toque de humor, y cierras preguntando qué añadir; la lista de componentes queda en la descripción.","como":"Guion corto por versión; sirve para series de un mismo proyecto.","ideal":"Makers, hardware y proyectos personales."},{"id":"N9","nombre":"Noticia o alerta explicada","color":"#e8402a","desc":"Qué pasó (con fecha y fuente) → cómo funciona → por qué importa (una cifra) → qué hacer, con nivel de gravedad y cierre \"mándaselo a quien…\".","como":"Guion de 60-70 s con la fuente citada; hay que verificar el dato antes de publicar.","ideal":"Ciberseguridad, IA, negocio y noticias de nicho."},{"id":"N10","nombre":"Comedia de diálogo tipo falso documental, el público elige el siguiente","color":"#f2a33a","desc":"Un episodio breve de humor con 2-3 personajes que discuten una situación absurda, con giro al final y cierre preguntando qué pasa en el próximo episodio.","como":"Guion de ~130 palabras por minuto en diálogo; cada episodio termina con una pregunta para que los comentarios decidan. Sirve para series con personajes propios.","ideal":"Comedia y series de personajes recurrentes (cruza con N2)."}],"referencias":[{"id":"yt-sotanos","titulo":"¿Por qué en Latinoamérica NO HAY sótanos?","cuenta":"FrankBaun Play","plataforma":"YouTube Shorts","url":"https://youtube.com/shorts/XfTaVEvao4s","carpeta":null,"visual":["V1"],"narrativa":["N1"],"marcada":true,"resumen":"Casa y capas de suelo en corte que se transforman: la línea de congelación empuja y rompe la casa, el pozo se vuelve cuarto, y en Latinoamérica el sótano sale carísimo. Remate con humor (piscina).","gancho":"Si tu casa tuviera sótano en Latinoamérica, probablemente se vendría abajo.","cierre":"Si escarbás un metro, te hacés una piscina. + avatar \"Siguiendo\".","recursos":["maqueta que se transforma","pocos cortes (3 en 67 s)","flechas y partículas","subtítulo con palabra clave en recuadro"],"encaje":"Lo que ya hacemos. La referencia objetivo de Francisco.","video":null,"plancha":null,"poster":"posters/yt-sotanos.jpg","metricas":{"ancho":1080,"alto":1920,"duracion":67.2,"cortes":3,"segPorPlano":16.8,"palabrasPorMin":204,"likes":64062,"fecha":"31/10/2026"}},{"id":"yt-claude3d","titulo":"Claude 3D Cartoon Reels (cómo se hacen)","cuenta":"Alok Verma","plataforma":"YouTube Shorts","url":"https://www.youtube.com/shorts/x9KVhABqQwc","carpeta":null,"visual":["V2"],"narrativa":["N5"],"resumen":"Un muñeco de cubos y un cubo naranja conversan y explican en 5 pasos cómo se hacen reels 3D con código: guion, dos voces, escena en Three.js, sincronía y render local.","gancho":"These 3D cartoon reels, Claude made them.","cierre":"Comenta CLAUDE y te mando la guía completa.","recursos":["subtítulo palabra por palabra","tarjetas de código y ondas de audio","contador de render","prueba social (91K likes)"],"encaje":"Es el método que usamos. Sirve como estilo si queremos personajes que hablan.","video":null,"plancha":null,"poster":"posters/yt-claude3d.jpg","metricas":{"ancho":1080,"alto":1920,"duracion":43.5,"cortes":12,"segPorPlano":3.3,"palabrasPorMin":176,"likes":335,"fecha":"29/10/2026"}},{"id":"ig-Dfnf_15Bsc1","titulo":"Parte 8 · Alerta en el supermercado","cuenta":"Historias interesantes","plataforma":"Instagram","url":"https://www.instagram.com/reels/Dfnf_15Bsc1/","carpeta":null,"visual":["V2"],"narrativa":["N2","N3"],"resumen":"En primera persona, un cliente en una caja de supermercado ve que todo se vuelve rojo y aparece una criatura; despierta en un camión del ejército (era un sueño) y termina eligiendo entre dos salidas.","gancho":"Una señora que reclama el precio de la yerba… y de pronto todos miran raro.","cierre":"¿QUÉ HACÉS? 1) Correr y escaparme 2) Vinimos juntos, nos vamos juntos. Comentá acá.","recursos":["POV con manos en pantalla","lente ojo de pez","insignia PARTE 8 + \"ganó: acompañar a Manu\"","tomas largas (11 s por plano)","subtítulo al pie con color por personaje"],"encaje":"Ficción en serie con mucha interacción. Un solo escenario por parte simplifica la producción.","video":null,"plancha":null,"poster":"posters/ig-Dfnf_15Bsc1.jpg","metricas":{"ancho":720,"alto":1280,"duracion":137.2,"cortes":11,"segPorPlano":11.4,"palabrasPorMin":105,"likes":19743,"fecha":"11/11/2026"}},{"id":"ig-DflnaFPtRLR","titulo":"Parte 4 · Decidiste buscar a papá","cuenta":"Historias interesantes","plataforma":"Instagram","url":"https://www.instagram.com/reels/DflnaFPtRLR/","carpeta":null,"visual":["V2"],"narrativa":["N2","N3"],"resumen":"Dentro de una cabaña de madera, dos hermanos discuten si ayudar a la hermana de una amiga mientras afuera hay sombras que golpean la puerta. Un solo plano continuo de 90 s con cámara en primera persona.","gancho":"¡Papá, ayuda, vení! Vinieron las sombras.","cierre":"SU HERMANA VOLVIÓ. LAS SOMBRAS TAMBIÉN. ¿Qué hacés? Dejarla hablar con su hermana / Convencerla de quedarse en el cuarto.","recursos":["un solo plano continuo","ojo de pez","inserto de personajes con diálogo corto","pantalla final de 2 opciones"],"encaje":"La más barata de producir de las ficciones: un escenario, cámara casi fija y mucho diálogo.","video":null,"plancha":null,"poster":"posters/ig-DflnaFPtRLR.jpg","metricas":{"ancho":720,"alto":1280,"duracion":89.8,"cortes":1,"segPorPlano":44.9,"palabrasPorMin":87,"likes":38214,"fecha":"11/11/2026"}},{"id":"ig-Dfm2UWyATw7","titulo":"Cuenta regresiva en el colectivo","cuenta":"Quedate al final · Historias","plataforma":"Instagram","url":"https://www.instagram.com/reels/Dfm2UWyATw7/","carpeta":null,"visual":["V2"],"narrativa":["N2"],"resumen":"En un colectivo, todos los celulares marcan una cuenta regresiva de 59 minutos. Llega a cero, no pasa nada, y le llega un mensaje: \"Sos el primero. No le digas a nadie\".","gancho":"¿A ustedes también les apareció esto?","cierre":"¿Le hago caso… o se lo muestro a todos? Comentá 1 o 2.","recursos":["etiquetas de quien habla (VOS, CHOFER, NORMA)","cuenta regresiva como motor de tensión","colores vivos, cámara POV","5 s por plano"],"encaje":"Misterio ligero, de tono más amable. Buen candidato para un primer experimento con diálogo.","video":null,"plancha":null,"poster":"posters/ig-Dfm2UWyATw7.jpg","metricas":{"ancho":720,"alto":1280,"duracion":70.1,"cortes":13,"segPorPlano":5,"palabrasPorMin":111,"likes":37173,"fecha":"11/11/2026"}},{"id":"ig-DfnoK0BxqFZ","titulo":"La Flaca · Capítulo 4: La más querida","cuenta":"Mik","plataforma":"Instagram","url":"https://www.instagram.com/reels/DfnoK0BxqFZ/","carpeta":null,"visual":["V3"],"narrativa":["N3"],"resumen":"Terror rural con una iglesia, velas y un maizal de noche: un viejo explica que la Flaca viene por los animales y luego por el más querido. Final con el aviso de que la película completa está en YouTube.","gancho":"No volteen. Se la dio una niña. Vino a escoger.","cierre":"LA FLACA · Capítulo 4 · La más querida. Película completa en YouTube, link en mi perfil.","recursos":["muñecos de bloques con luz de velas","planos cerrados de rostros","subtítulo pequeño al pie con sonidos entre corchetes","ritmo lento (76 palabras por minuto)","embudo a YouTube"],"encaje":"El más ambicioso en imagen. La atmósfera viene de la iluminación y el sonido, no de modelos complicados.","video":null,"plancha":null,"poster":"posters/ig-DfnoK0BxqFZ.jpg","metricas":{"ancho":720,"alto":1280,"duracion":177.8,"cortes":47,"segPorPlano":3.7,"palabrasPorMin":76,"likes":45613,"fecha":"11/11/2026"}},{"id":"ig-DfKQxdlou50","titulo":"Crónicas Zombi · Cap. 1: El apagón","cuenta":"Crónicas Zombi","plataforma":"Instagram","url":"https://www.instagram.com/reels/DfKQxdlou50/","carpeta":null,"visual":["V4"],"narrativa":["N3"],"resumen":"Narración en segunda persona (\"tú\") de un apagón por tormenta, una alerta de Defensa Civil a las 3:47 y la ciudad llena de infectados. Usa chats de vecinos, la batería del celular y cuántos litros de agua quedan como recurso.","gancho":"A las nueve y 14 de la noche, la tormenta corta la luz de todo el barrio.","cierre":"Ser la única luz encendida de toda la calle. Sigue la historia.","recursos":["pantallas de celular y chat como narrador","datos de supervivencia (≈ 35 litros → 2 semanas)","paleta azul noche","voz en off tranquila"],"encaje":"Muy bien escrito. La parte visual necesita ilustraciones generadas.","video":null,"plancha":null,"poster":"posters/ig-DfKQxdlou50.jpg","metricas":{"ancho":720,"alto":1280,"duracion":153.1,"cortes":23,"segPorPlano":6.4,"palabrasPorMin":148,"likes":393,"fecha":"31/10/2026"}},{"id":"ig-Dfk4BXYvXhb","titulo":"EL ÚLTIMO · Parte 1: Paciente 12","cuenta":"lamayoriadecide","plataforma":"Instagram","url":"https://www.instagram.com/reels/Dfk4BXYvXhb/","carpeta":null,"visual":["V5"],"narrativa":["N3","N2"],"resumen":"Un hombre despierta tras 3 años en coma y es el último varón vivo. Mezcla ficción con genética (el cromosoma Y y el trasplante de médula), con paneles que dicen \"DATO REAL\" y contadores de \"hombres vivos\".","gancho":"Despiertas tras 3 años en coma. Y eres el último hombre vivo en la tierra.","cierre":"¿VARELA o TORRE? Comenta tu respuesta. La mayoría decide la Parte 2.","recursos":["HUD de datos (HOMBRES VIVOS, DÍA 14, 19/20 PILOTOS)","insignia DATO REAL","42 cortes (3 s por plano)","palabra clave en rojo en el subtítulo","votación final"],"encaje":"El mejor ejemplo de mezclar ciencia real con ficción. Los HUD ya sabemos hacerlos.","video":null,"plancha":null,"poster":"posters/ig-Dfk4BXYvXhb.jpg","metricas":{"ancho":720,"alto":1280,"duracion":136.3,"cortes":42,"segPorPlano":3.2,"palabrasPorMin":147,"likes":273,"fecha":"10/11/2026"}},{"id":"ig-Dfo8FJSRPRy","titulo":"Claude puede manejar tu Instagram (Instagram Agent)","cuenta":"Sofiane Larbaouri","plataforma":"Instagram","idioma":"en","url":"https://www.instagram.com/reels/Dfo8FJSRPRy/","carpeta":null,"visual":["V6"],"narrativa":["N5"],"resumen":"Un presentador de caricatura abajo a la derecha y, sobre fondo crema, una navaja suiza con 11 habilidades, tarjetas de posts y calendarios que entran una tras otra. Habla muy rápido (229 palabras por minuto).","gancho":"Claude can now manage your entire Instagram account for you.","cierre":"Comment \"Claude\" y te mando la guía completa.","recursos":["presentador SVG","metáfora visual (navaja con herramientas)","palabra clave en amarillo","íconos y tarjetas que entran de a una"],"encaje":"Muy factible y barato de producir. Sirve para explicar herramientas, servicios y listas.","video":null,"plancha":null,"poster":"posters/ig-Dfo8FJSRPRy.jpg","metricas":{"ancho":720,"alto":1280,"duracion":51.2,"cortes":8,"segPorPlano":5.7,"palabrasPorMin":229,"likes":15,"fecha":"12/11/2026"}},{"id":"ig-DfiFsHPBPCd","titulo":"Bot de WhatsApp para una ferretería","cuenta":"Spekgen","plataforma":"Instagram","url":"https://www.instagram.com/reels/DfiFsHPBPCd/","carpeta":null,"visual":["V7"],"narrativa":["N5"],"resumen":"Paso a paso técnico de cómo un bot de WhatsApp contesta a un cliente de ferretería, por qué inventa precios y cómo se corrige con una lista de precios. Maquetas de celular, JSON y círculos numerados.","gancho":"Si el WhatsApp de tu ferretería contesta solo, ya tienes un bot… pero te escriben, tienen taladros y tu bot contesta \"para ventas, marca uno\".","cierre":"Escribe \"BOT\" para el checklist. Foto real de un celular en la mano.","recursos":["modo oscuro","círculos numerados que señalan cada parte","JSON con resaltado","problema → falla → arreglo","209 palabras por minuto"],"encaje":"Encaja con automatización y chatbots. Muy factible: todo es HTML.","video":null,"plancha":null,"poster":"posters/ig-DfiFsHPBPCd.jpg","metricas":{"ancho":720,"alto":1280,"duracion":84.3,"cortes":20,"segPorPlano":4,"palabrasPorMin":209,"likes":17157,"fecha":"09/11/2026"}},{"id":"ig-DfR_ZEWBj6V","titulo":"SCP-001: el Guardián de la puerta","cuenta":"Archivo SCP","plataforma":"Instagram","url":"https://www.instagram.com/reels/DfR_ZEWBj6V/","carpeta":null,"visual":["V8"],"narrativa":["N4"],"resumen":"Una figura alada de 300 metros con luz dorada vigila una puerta. Una ficha de archivo va completándose con pruebas de ataque, el objeto que se \"borra\" y un adenda final. Cámara casi fija, solo 2 cortes en 111 s.","gancho":"Este ser de 300 metros, con una espada de fuego, no se mueve.","cierre":"SCP-001: mensaje recibido, siguiente expediente.","recursos":["ficha de expediente que se llena","barras negras de censura","clase Euclid / Keter como insignia","una sola imagen potente"],"encaje":"Ideal para mundos de ficción propios. Atención: SCP es un universo con licencia abierta (CC BY-SA); si se usa, hay que dar crédito.","video":null,"plancha":null,"poster":"posters/ig-DfR_ZEWBj6V.jpg","metricas":{"ancho":720,"alto":1280,"duracion":111.4,"cortes":2,"segPorPlano":37.1,"palabrasPorMin":138,"likes":28580,"fecha":"03/11/2026"}},{"id":"ig-DffFybBOZJ9","titulo":"Skills para que Claude edite tus videos (links directos)","cuenta":"ZeroWork || Automations","plataforma":"Instagram","url":"https://www.instagram.com/reels/DffFybBOZJ9/","carpeta":null,"visual":["V2"],"narrativa":["N5"],"resumen":"Un presentador de cubos en una oficina critica a quienes piden comentar una palabra para darte un link público, y promete lo contrario: links directos en la descripción. Iconos (Instagram, WhatsApp, GitHub) aparecen flotando a su alrededor mientras habla.","gancho":"Ves una skill genial para Claude. Y para darte el link, te piden comentar una palabra.","cierre":"Links en la descripción: sin comentar, sin grupos, sin dejar tu correo.","recursos":["presentador voxel en oficina","iconos que flotan alrededor","subtítulo con la palabra clave en amarillo","23 cortes en 48 s (2 s por plano, mismo escenario con otros ángulos)","etiqueta LINKS EN LA DESCRIPCIÓN"],"encaje":"Mismo método que el Claude 3D cartoon: muy cercano a lo que ya hacemos. Sirve como contraejemplo del \"comenta X\".","video":null,"plancha":null,"poster":"posters/ig-DffFybBOZJ9.jpg","metricas":{"ancho":720,"alto":1280,"duracion":48.1,"cortes":23,"segPorPlano":2,"palabrasPorMin":163,"likes":4624,"fecha":"08/11/2026"}},{"id":"ig-Dfhndpik4y6","titulo":"Miss me, Danny? · Ep. 4: Something true","cuenta":"Arinna · Miss Me, Danny?","plataforma":"Instagram","idioma":"en","url":"https://www.instagram.com/reels/Dfhndpik4y6/","carpeta":null,"visual":["V9"],"narrativa":["N6"],"resumen":"Dos personajes quedan atrapados entre pisos en un ascensor y se piden decirse \"algo verdadero\". Comedia romántica de baja resolución con primeros planos, subtítulos pixel y música; cierra con un mensaje en el celular.","gancho":"Miss me, Danny. We stopped. Why did we stop?","cierre":"Mensaje en el celular: \"Did u meet him yet?\" (cliffhanger).","recursos":["estética PS1 low-poly de anime","un solo escenario (ascensor)","primeros planos de rostros","subtítulos tipográfica pixel","40 cortes en 83 s","música de fondo"],"encaje":"Estética muy distinta. Los rostros expresivos son el reto; el escenario único y el diálogo son baratos.","video":null,"plancha":null,"poster":"posters/ig-Dfhndpik4y6.jpg","metricas":{"ancho":720,"alto":1280,"duracion":83.5,"cortes":40,"segPorPlano":2,"palabrasPorMin":107,"likes":29601,"fecha":"09/11/2026"}},{"id":"ig-Dfk_Xi2AhNk","titulo":"La psicología de las personas flojas pero ambiciosas","cuenta":"soypalitosg","plataforma":"Instagram","url":"https://www.instagram.com/reels/Dfk_Xi2AhNk/","carpeta":null,"visual":["V10"],"narrativa":["N7"],"resumen":"Palitos, un personaje de palitos, sueña en grande y se mueve en pequeño. Con metáforas animadas (un Jenga que se cae, un tigre, una montaña) y un estudio de Peter Gollwitzer sobre planes \"si-entonces\" explica por qué fallamos y cómo empezar.","gancho":"La psicología de las personas flojas pero ambiciosas. Este es Palitos.","cierre":"¿Tu vida es un caos? Empieza el reto de 30 días con Palitos. Comenta Palitos y te lo comparto.","recursos":["personaje recurrente de palitos","paleta morado y rosa","gráficos de barras y casillas de hábito","metáforas visuales por idea","formato horizontal 16:9 de 7 minutos","115 cortes (3,7 s por plano)"],"encaje":"487 mil me gusta. Largo y horizontal: el formato que mejor paga en YouTube. Muchas ilustraciones, pero son figuras simples.","video":null,"plancha":null,"poster":"posters/ig-Dfk_Xi2AhNk.jpg","metricas":{"ancho":1280,"alto":720,"duracion":432.6,"cortes":115,"segPorPlano":3.7,"palabrasPorMin":164,"likes":487307,"fecha":"10/11/2026"}},{"id":"ig-DfGESTXO-1U","titulo":"SCP-096: si ves su cara, irá a por ti","cuenta":"Archivo SCP","plataforma":"Instagram","url":"https://www.instagram.com/reels/DfGESTXO-1U/","carpeta":null,"visual":["V8"],"narrativa":["N4"],"resumen":"Recorre la celda de contención de SCP-096 en 3D monocromo, con cotas, láseres, fichas de expediente y barras negras que tapan la cara. Contadores animados (600 balas, 35 km/h) y una solicitud formal al final.","gancho":"Esta celda no tiene ni una sola cámara. Si ves su cara, aunque sea en una foto, vendrá a por ti.","cierre":"Comenta qué SCP te enseño mañana.","recursos":["cámara que recorre la celda","cotas, láseres y etiquetas técnicas","fichas de expediente con barras negras","contadores animados","silueta sin cara (fácil de hacer)","votación final"],"encaje":"Misma familia que SCP-001 pero más técnica y con más movimiento de cámara. SCP tiene licencia abierta (CC BY-SA): si se usa, hay que dar crédito.","video":null,"plancha":null,"poster":"posters/ig-DfGESTXO-1U.jpg","metricas":{"ancho":720,"alto":1280,"duracion":80.8,"cortes":6,"segPorPlano":11.5,"palabrasPorMin":136,"likes":29365,"fecha":"29/10/2026"}},{"id":"ig-Dfm4O_ExCJY","titulo":"¿Por qué los fideos del vaso nunca tocan el fondo?","cuenta":"Así que… | Curiosidades","plataforma":"Instagram","url":"https://www.instagram.com/reels/Dfm4O_ExCJY/","carpeta":null,"visual":["V10"],"narrativa":["N1"],"resumen":"Corte transversal del vaso: el bloque de fideos queda colgado a propósito. En 1971 caía torcido, así que lo dieron vuelta y le pusieron el vaso encima, como un sombrero. Explica también el aire de abajo para cocinar parejo.","gancho":"¿Por qué los fideos del vaso nunca tocan el fondo? Y no, no es para que parezca que trae más.","cierre":"Mandáselo a ese amigo que come fideos de vaso. + link en la biografía para hacer videos como este.","recursos":["corte transversal con cotas y etiquetas","línea de tiempo (1971)","animación mecánica","subtítulo con palabra clave en recuadro","pausa para pedir like y seguir","pantalla final de compartir"],"encaje":"Es nuestro N1 en 2D vectorial: mismo guion de curiosidad (pregunta, mecanismo, historia, remate). Muy factible para objetos cotidianos.","video":null,"plancha":null,"poster":"posters/ig-Dfm4O_ExCJY.jpg","metricas":{"ancho":720,"alto":1280,"duracion":61.4,"cortes":7,"segPorPlano":7.7,"palabrasPorMin":192,"likes":102059,"fecha":"11/11/2026"}},{"id":"ig-DfnVQP4xhoV","titulo":"Brazalete CRIS v10 (el brazo de Iron Man impreso en 3D)","cuenta":"Mini IronMan","plataforma":"Instagram","url":"https://www.instagram.com/reels/DfnVQP4xhoV/","carpeta":null,"visual":["V11"],"narrativa":["N8"],"resumen":"Un chico de 14 años enseña la versión 10 de su brazalete impreso en 3D: pantalla táctil de 3,49\", un asistente (Cris) que responde desde la muñeca, batería, altavoz y cámara. Con humor (\"Tony Stark usaba oro y titanio. Yo, velcro\") y una pregunta final.","gancho":"Tengo 14 años y esto es lo más parecido al brazo de Iron Man que se puede fabricar con una impresora 3D.","cierre":"¿Qué le añado, al brazalete o a Cris? Leo todos los comentarios. + lista de componentes en la descripción.","recursos":["modelo 3D del objeto con la cámara recorriéndolo","interfaz HUD cian (onda de voz, hora, batería)","titular en mayúscula con la palabra clave en cian","versiones tachadas (V8 y V9 \"no existen, oficialmente\")","etiquetas de componentes (altavoz, batería)","22 cortes en 49 s (2 s por plano)"],"encaje":"Encaja con tus proyectos de impresión 3D y ESP32: se pueden importar los STL de tus piezas a Three.js. Una serie con un video por versión de cada proyecto.","video":null,"plancha":null,"poster":"posters/ig-DfnVQP4xhoV.jpg","metricas":{"ancho":720,"alto":1280,"duracion":49.3,"cortes":22,"segPorPlano":2.1,"palabrasPorMin":181,"likes":3251,"fecha":"11/11/2026"}},{"id":"ig-DfpEAsTKdSD","titulo":"Parchaste tu servidor, pero el hacker sigue adentro (GSocket)","cuenta":"La Brecha | Ciberseguridad","plataforma":"Instagram","url":"https://www.instagram.com/reels/DfpEAsTKdSD/","carpeta":null,"visual":["V12"],"narrativa":["N9"],"resumen":"Noticia de ciberseguridad explicada en 71 s: Microsoft reveló que hackers usan GSocket como puerta trasera en servidores Linux. Muestra los 3 pasos del ataque, por qué el firewall no la ve, la cifra (+356 %) y qué revisar.","gancho":"Parchaste tu servidor. Pero el hacker sigue adentro.","cierre":"Mándaselo a quien administre tus servidores. Síguenos y compártenos.","recursos":["fondo claro con tipografía condensada negra y roja","nivel de gravedad (4/5) y fecha en el encabezado","fuente citada en el pie","ventanas de terminal y tarjetas numeradas (3 pasos)","cifra gigante (+356 %)","silueta de hacker que reacciona","fotos marcadas como imagen ilustrativa","36 cortes en 71 s"],"encaje":"Formato de noticia repetible para ciberseguridad, IA o cualquier tema con fuente. Muy factible: HTML puro. Hay que citar la fuente y verificar el dato antes de publicar.","video":null,"plancha":null,"poster":"posters/ig-DfpEAsTKdSD.jpg","metricas":{"ancho":720,"alto":1280,"duracion":71.3,"cortes":36,"segPorPlano":1.9,"palabrasPorMin":161,"likes":32,"fecha":"12/11/2026"}},{"id":"ig-DflZWhwRENf","titulo":"Doug Trio: parodia de Pokémon con personajes tipo peluche","cuenta":"rober.glowup","plataforma":"Instagram","url":"https://www.instagram.com/reel/DflZWhwRENf/","carpeta":null,"visual":["V13"],"narrativa":["N10"],"resumen":"Parodia de 59 s en inglés: tres Diglett se fusionan en un Dugtrio y el protagonista tiene que decidir cuáles se quedan en el equipo y cuáles van al PC. Todo es diálogo rápido entre personajes 3D tipo peluche, con humor absurdo y un giro final (\"Doug Trio: un equipo de trillizos Diglett\").","gancho":"Estamos en Dugtrio. Hace cinco minutos eras tres Diglett.","cierre":"Un giro tierno (\"Y no vamos a necesitar el PC\") y un \"¿Max?\" final que deja la puerta abierta al próximo episodio.","recursos":["personajes 3D estilo peluche con ojos grandes","diálogo rápido de 3-4 voces","24 cortes en 59 s (2,4 s por plano)","planos de reacción cortos","chiste construido sobre las reglas del juego","final con giro y personaje que llama a otro"],"idioma":"en","encaje":"Solo se toma el formato (comedia de diálogo con peluches, 1 episodio por semana y el público elige el siguiente), no los personajes ni el guion: es una parodia de propiedad de terceros. Para ti: personajes propios, y encaja con V2/N2. Nota: el perfil @rober.glowup no se pudo abrir sin sesión, así que solo se analizó este reel.","video":null,"plancha":null,"poster":"posters/ig-DflZWhwRENf.jpg","metricas":{"ancho":720,"alto":1280,"duracion":59.5,"cortes":24,"segPorPlano":2.4,"palabrasPorMin":133,"likes":18576,"fecha":"11/11/2026"}}],"mios":[{"id":"personal-2026-11-12-v10-glimmer-cape","titulo":"Glimmer Cape para supports (Dota 2)","tipo":"Animación 2D · 45 s","resumen":"","voz":null,"duracion":45,"ancho":1080,"alto":1920,"lufs":null,"video":"videos/video-1.mp4","poster":"posters/video-1.jpg","guion":null,"costo":null},{"id":"personal-2026-11-12-v6-resumen-nino-costero","titulo":"Resumen: El Niño costero (12/11/2026)","tipo":"Animación plana con presentador · 30 s · datos del comunicado ENFEN N.° 19-2026","resumen":"","voz":null,"duracion":30,"ancho":1080,"alto":1920,"lufs":null,"video":"videos/video-2.mp4","poster":"posters/video-2.jpg","guion":null,"costo":null},{"id":"personal-2026-11-12-m01-fierros-en-espera","titulo":"¿Por qué en Lima hay tantos fierros saliendo de los techos?","tipo":"Explicativo 3D · 60 s","resumen":"","voz":null,"duracion":60,"ancho":1080,"alto":1920,"lufs":null,"video":"videos/video-3.mp4","poster":"posters/video-3.jpg","guion":null,"costo":null},{"id":"personal-2026-11-11-m00-texto-en-movimiento","titulo":"Texto en movimiento (prueba)","tipo":"Primera prueba · 15 s · sin audio","resumen":"","voz":null,"duracion":15,"ancho":1080,"alto":1920,"lufs":null,"video":"videos/video-4.mp4","poster":"posters/video-4.jpg","guion":null,"costo":null}],"voces":[{"id":"em_alex","nombre":"Alex","base":"em_alex","genero":"hombre","velocidad":1.1,"tono":0,"uso":"Explicativos y narración general.","usada":[],"muestra":"voces/em_alex.mp3"},{"id":"em_santa","nombre":"Santa","base":"em_santa","genero":"hombre","velocidad":1.1,"tono":0,"uso":"Segunda voz masculina; sirve para un segundo personaje.","usada":[],"muestra":"voces/em_santa.mp3"},{"id":"ef_dora","nombre":"Dora","base":"ef_dora","genero":"mujer","velocidad":1.1,"tono":0,"uso":"Narración femenina y personajes mujer.","usada":[],"muestra":"voces/ef_dora.mp3"},{"id":"em_alex-grave","nombre":"Alex grave","base":"em_alex","genero":"hombre","velocidad":1.1,"tono":-3,"uso":"Personaje adulto o autoridad (militar, antagonista).","usada":[],"muestra":"voces/em_alex-grave.mp3"},{"id":"em_alex-agudo","nombre":"Alex agudo","base":"em_alex","genero":"hombre","velocidad":1.1,"tono":3,"uso":"Personaje joven o nervioso.","usada":[],"muestra":"voces/em_alex-agudo.mp3"},{"id":"em_alex-rapido","nombre":"Alex rápido","base":"em_alex","genero":"hombre","velocidad":1.3,"tono":0,"uso":"Tutoriales de ritmo veloz (N5, 200+ palabras por minuto).","usada":[],"muestra":"voces/em_alex-rapido.mp3"},{"id":"em_santa-pausado","nombre":"Santa pausado","base":"em_santa","genero":"hombre","velocidad":0.9,"tono":0,"uso":"Terror y suspenso (N3), narrador en segunda persona.","usada":[],"muestra":"voces/em_santa-pausado.mp3"},{"id":"em_santa-agudo","nombre":"Santa agudo","base":"em_santa","genero":"hombre","velocidad":1.1,"tono":2,"uso":"Otro personaje joven; distinto de Alex agudo.","usada":[],"muestra":"voces/em_santa-agudo.mp3"},{"id":"ef_dora-grave","nombre":"Dora grave","base":"ef_dora","genero":"mujer","velocidad":1.1,"tono":-2,"uso":"Mujer adulta, abuela o madre.","usada":[],"muestra":"voces/ef_dora-grave.mp3"},{"id":"ef_dora-aguda","nombre":"Dora aguda","base":"ef_dora","genero":"mujer","velocidad":1.1,"tono":3,"uso":"Niña o personaje joven.","usada":[],"muestra":"voces/ef_dora-aguda.mp3"},{"id":"ef_dora-rapida","nombre":"Dora rápida","base":"ef_dora","genero":"mujer","velocidad":1.3,"tono":0,"uso":"Tutoriales veloces con voz femenina.","usada":[],"muestra":"voces/ef_dora-rapida.mp3"}],"otrasVoces":[{"id":"propia","nombre":"Mi propia voz","desc":"Grabas tú el guion (celular u OBS). Es lo más auténtico para redes; yo sincronizo subtítulos y escenas con tu audio."},{"id":"clonada","nombre":"Voz clonada local","desc":"Un modelo local (F5-TTS o XTTS) imita una voz a partir de unos segundos de audio. Hay que instalarlo (varios GB) y usarlo solo con voces propias o con permiso. Te pido el OK antes de bajarlo."}],"costos":null,"textoVoz":"Los fierros que salen de los techos de Lima no son un descuido: son una promesa. Y a las tres y cuarenta y siete, todos los celulares del edificio sonaron a la vez. ¿Qué harías tú?","motorVoz":"Kokoro-82M, local, gratis. Solo tiene 3 voces en español; las demás opciones son la misma voz con otro tono o velocidad.","publico":true}</script>
+<script>
+(function () {
+  var D = JSON.parse(document.getElementById('datos').textContent);
+  var V = {}, N = {};
+  D.visual.forEach(function (x) { V[x.id] = x; });
+  D.narrativa.forEach(function (x) { N[x.id] = x; });
+  var RID = {};
+  D.referencias.forEach(function (r) { RID[r.id] = r; });
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  var store = {
+    get: function (k, d) { try { var v = localStorage.getItem('galeria:' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set: function (k, v) { try { localStorage.setItem('galeria:' + k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento: la página sigue funcionando */ } }
+  };
+  var S = {
+    tab: 'refs', fV: [], fN: [],
+    favs: store.get('favs', []), estV: store.get('estV', []), estN: store.get('estN', []),
+    tema: store.get('tema', ''), notas: store.get('notas', {}), valor: store.get('valor', {}), extra: store.get('extra', ''), voz: store.get('voz', { principal: '', segunda: '' }), dur: store.get('dur', ''), impacto: store.get('impacto', {}), vocesOcultas: store.get('vocesOcultas', [])
+  };
+  function guardar() { ['favs', 'estV', 'estN', 'tema', 'notas', 'valor', 'extra', 'voz', 'dur', 'impacto', 'vocesOcultas'].forEach(function (k) { store.set(k, S[k]); }); }
+  function alterna(arr, x) { var i = arr.indexOf(x); if (i >= 0) arr.splice(i, 1); else arr.push(x); }
+  function tagHTML(t) { return '<span class="tag"><span class="punto" style="background:' + esc(t.color) + '"></span>' + esc(t.id) + ' · ' + esc(t.nombre) + '</span>'; }
+  function esH(r) { return r.metricas && r.metricas.ancho > r.metricas.alto; }
+  function fmtLikes(n) { if (n == null) return ''; return n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace('.', ',') + ' K ♥' : n + ' ♥'; }
+  function metricas(m) {
+    var a = [];
+    if (m.ancho > m.alto) a.push('horizontal');
+    if (m.duracion) a.push(Math.round(m.duracion) + ' s');
+    if (m.cortes != null) a.push(m.cortes + ' cortes');
+    if (m.segPorPlano) a.push(m.segPorPlano + ' s/plano');
+    if (m.palabrasPorMin) a.push(m.palabrasPorMin + ' pal/min');
+    var l = fmtLikes(m.likes); if (l) a.push(l);
+    return a;
+  }
+
+  document.getElementById('sub').textContent = D.publico ? 'Elige estilo, voz y duración para un video y copia el mensaje desde “Mi elección” · actualizado ' + D.generado : 'Referencias para elegir estilo y videos generados · actualizado ' + D.generado + ' · todo local: los videos no salen de tu PC';
+
+  /* ---------- pestañas ---------- */
+  var TABS = [['refs', 'Referencias'], ['estilos', 'Estilos'], ['voces', 'Voces'], ['mios', 'Mis videos'], ['eleccion', 'Mi elección']];
+  function pintaTabs() {
+    var n = S.favs.length + S.estV.length + S.estN.length + (S.voz.principal ? 1 : 0) + (S.voz.segunda ? 1 : 0);
+    document.getElementById('tabs').innerHTML = TABS.map(function (t) {
+      var extra = t[0] === 'eleccion' && n ? '<span class="badge-n">' + n + '</span>' : '';
+      return '<button role="tab" data-tab="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + t[1] + extra + '</button>';
+    }).join('');
+  }
+  document.getElementById('tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-tab]'); if (!b) return;
+    S.tab = b.getAttribute('data-tab'); pinta(); window.scrollTo(0, 0);
+  });
+
+  /* ---------- referencias ---------- */
+  function cumple(r) {
+    var okV = !S.fV.length || r.visual.some(function (x) { return S.fV.indexOf(x) >= 0; });
+    var okN = !S.fN.length || r.narrativa.some(function (x) { return S.fN.indexOf(x) >= 0; });
+    return okV && okN;
+  }
+  function chipsFiltro(lista, sel, attr) {
+    return lista.map(function (x) {
+      return '<button class="chip" ' + attr + '="' + x.id + '" aria-pressed="' + (sel.indexOf(x.id) >= 0) + '"><span class="punto" style="background:' + esc(x.color) + '"></span>' + esc(x.id) + ' · ' + esc(x.nombre) + '</button>';
+    }).join('');
+  }
+  function tarjetaRef(r) {
+    var tags = r.visual.map(function (i) { return tagHTML(V[i]); }).concat(r.narrativa.map(function (i) { return tagHTML(N[i]); })).join('');
+    var m = metricas(r.metricas).join(' · ');
+    var fav = S.favs.indexOf(r.id) >= 0 ? '<span class="estrella">★ Me gusta</span>' : (r.marcada ? '<span class="estrella">Referencia objetivo</span>' : '');
+    return '<button class="tarjeta" data-ref="' + esc(r.id) + '" aria-label="Abrir ' + esc(r.titulo) + '">' +
+      '<div class="poster' + (esH(r) ? ' h' : '') + '"><img loading="lazy" src="' + esc(r.poster) + '" alt="" /><div class="play"><span></span></div>' + fav + '</div>' +
+      '<div class="cuerpo"><h3>' + esc(r.titulo) + '</h3><div class="cuenta">' + esc(r.cuenta) + ' · ' + esc(r.plataforma) + '</div>' +
+      '<div class="tags">' + tags + '</div><div class="metricas">' + esc(m) + '</div></div></button>';
+  }
+  function pintaRefs() {
+    var lista = D.referencias.filter(cumple);
+    return '<div class="filtros">' +
+      '<div class="fila-f"><span class="et">Visual</span>' + chipsFiltro(D.visual, S.fV, 'data-fv') + '</div>' +
+      '<div class="fila-f"><span class="et">Narrativa</span>' + chipsFiltro(D.narrativa, S.fN, 'data-fn') + '</div>' +
+      '<div class="nota">' + lista.length + ' de ' + D.referencias.length + ' referencias. Toca una para verla y elegirla.</div></div>' +
+      (lista.length ? '<div class="grid">' + lista.map(tarjetaRef).join('') + '</div>' : '<div class="vacio">Ninguna referencia con esa combinación.</div>');
+  }
+
+  /* ---------- estilos ---------- */
+  function minis(id, tipo) {
+    var refs = D.referencias.filter(function (r) { return (tipo === 'v' ? r.visual : r.narrativa).indexOf(id) >= 0; });
+    if (!refs.length) return '<div class="nota">Todavía sin referencias.</div>';
+    return '<div class="mini">' + refs.map(function (r) { return '<button data-ref="' + esc(r.id) + '" title="' + esc(r.titulo) + '"><img loading="lazy" src="' + esc(r.poster) + '" alt="' + esc(r.titulo) + '"></button>'; }).join('') + '</div>';
+  }
+  function bloqueEstilo(x, tipo) {
+    var sel = (tipo === 'v' ? S.estV : S.estN).indexOf(x.id) >= 0;
+    var fact = tipo === 'v'
+      ? '<span class="fact ' + (x.factibilidad.indexOf('alta') === 0 ? 'alta' : x.factibilidad.indexOf('media') === 0 ? 'media' : 'baja') + '">Factibilidad ' + esc(x.factibilidad) + '</span> <span class="nota">Esfuerzo: ' + esc(x.esfuerzo) + '</span>'
+      : '<span class="nota">Ideal para: ' + esc(x.ideal) + '</span>';
+    return '<div class="panel estilo"><h3><span class="punto" style="background:' + esc(x.color) + '"></span><span class="id">' + esc(x.id) + '</span>' + esc(x.nombre) + '</h3>' +
+      '<p>' + esc(x.desc) + '</p><p class="como"><strong>Cómo lo hago:</strong> ' + esc(x.como) + '</p><div>' + fact + '</div>' + minis(x.id, tipo) +
+      '<div class="acciones"><button class="btn primario" data-est="' + tipo + ':' + x.id + '" aria-pressed="' + sel + '">' + (sel ? 'Elegido ✓' : 'Elegir este estilo') + '</button></div></div>';
+  }
+  function pintaEstilos() {
+    return '<h2 class="sec">Estilos visuales (cómo se ve)</h2><div class="dos">' + D.visual.map(function (x) { return bloqueEstilo(x, 'v'); }).join('') + '</div>' +
+      '<h2 class="sec">Estilos narrativos (cómo se cuenta)</h2><div class="dos">' + D.narrativa.map(function (x) { return bloqueEstilo(x, 'n'); }).join('') + '</div>' +
+      '<p class="nota" style="margin-top:18px">Los dos ejes se combinan: por ejemplo V2 + N2 es una serie con muñecos 3D que termina pidiendo una decisión.</p>';
+  }
+
+  /* ---------- voces ---------- */
+  function todasVoces() { return D.voces.concat(D.otrasVoces); }
+  function nombreVoz(id) {
+    var x = todasVoces().filter(function (v) { return v.id === id; })[0];
+    return x ? x.nombre + (x.base ? ' (' + x.id + ')' : '') : id;
+  }
+  function vocesElegidasHTML() {
+    var a = [];
+    if (S.voz.principal) a.push('<span class="tag">Principal · ' + esc(nombreVoz(S.voz.principal)) + '</span>');
+    if (S.voz.segunda) a.push('<span class="tag">Segunda · ' + esc(nombreVoz(S.voz.segunda)) + '</span>');
+    return a.length ? a.join('') : '<span class="nota">Sin elegir (pestaña Voces).</span>';
+  }
+  function botonesVoz(id) {
+    var p = S.voz.principal === id, s = S.voz.segunda === id;
+    return '<div class="acciones"><button class="btn primario" data-voz="principal:' + esc(id) + '" aria-pressed="' + p + '">' + (p ? 'Voz principal ✓' : 'Voz principal') + '</button>' +
+      '<button class="btn" data-voz="segunda:' + esc(id) + '" aria-pressed="' + s + '">' + (s ? 'Segunda voz ✓' : 'Segunda voz') + '</button><button class="btn" data-voz-ocultar="' + esc(id) + '" title="La saca de la lista; se puede recuperar abajo">Quitar</button></div>';
+  }
+  function tarjetaVoz(v) {
+    var ajuste = [v.velocidad + '×'].concat(v.tono ? [(v.tono > 0 ? '+' : '') + v.tono + ' semitonos'] : []).join(' · ');
+    return '<div class="panel voz"><h3>' + esc(v.nombre) + '</h3><div class="tags"><span class="tag">' + esc(v.genero) + '</span><span class="tag">' + esc(ajuste) + '</span></div>' +
+      (v.muestra ? '<audio controls preload="none" src="' + esc(v.muestra) + '"></audio>' : '<div class="nota">Muestra no generada todavía.</div>') +
+      '<p class="nota">' + esc(v.uso) + '</p>' + (v.usada.length ? '<p class="nota">Usada en: ' + esc(v.usada.join(', ')) + '</p>' : '') + botonesVoz(v.id) + '</div>';
+  }
+  function descartadasHTML() {
+    var h = todasVoces().filter(function (v) { return S.vocesOcultas.indexOf(v.id) >= 0; });
+    if (!h.length) return '';
+    return '<h2 class="sec">Voces quitadas (' + h.length + ')</h2><div class="fila-f">' + h.map(function (v) { return '<button class="chip" data-voz-volver="' + esc(v.id) + '">' + esc(v.nombre) + ' · recuperar</button>'; }).join('') + '<button class="chip" data-voz-volver="*">Recuperar todas</button></div>';
+  }
+  function pintaVoces() {
+    var vis = function (v) { return S.vocesOcultas.indexOf(v.id) < 0; };
+    var base = D.voces.filter(vis).filter(function (v) { return v.id === v.base; }), vars = D.voces.filter(vis).filter(function (v) { return v.id !== v.base; });
+    return '<h2 class="sec">Voces para elegir</h2>' +
+      '<p class="nota">Todas dicen el mismo texto y salen al mismo volumen: “' + esc(D.textoVoz) + '”</p>' +
+      '<p class="nota">' + esc(D.motorVoz) + ' Elige una <strong>voz principal</strong> (narrador) y, si el video tiene diálogo, una <strong>segunda voz</strong>.</p>' +
+      '<h2 class="sec">Voces base</h2><div class="grid-voz">' + base.map(tarjetaVoz).join('') + '</div>' +
+      '<h2 class="sec">Variantes (otro tono u otra velocidad)</h2><div class="grid-voz">' + vars.map(tarjetaVoz).join('') + '</div>' +
+      '<h2 class="sec">Otras opciones</h2><div class="grid-voz">' + D.otrasVoces.filter(vis).map(function (v) {
+        return '<div class="panel voz"><h3>' + esc(v.nombre) + '</h3><p class="nota">' + esc(v.desc) + '</p>' + botonesVoz(v.id) + '</div>';
+      }).join('') + '</div>' + descartadasHTML();
+  }
+
+  /* ---------- mis videos ---------- */
+  /* ---------- costo y complejidad ---------- */
+  function nf(x, d) { return Number(x).toLocaleString('es-PE', { maximumFractionDigits: d == null ? 2 : d }); }
+  var CO = (D.costos || {}), COV = D.mios.filter(function (x) { return x.costo; });
+  var PROM = COV.length ? COV.reduce(function (a, x) { return a + x.costo.unidades; }, 0) / COV.length : 0;
+  var TOTALCO = COV.reduce(function (a, x) { return a + x.costo.unidades; }, 0);
+  function nivelGasto(u) { return u < PROM * 0.7 ? ['bajo', 'alta'] : u > PROM * 1.3 ? ['alto', 'baja'] : ['medio', 'media']; }
+  function pctLimite(u) { var k = CO.calibracion && CO.calibracion.unidadesPorPorcentaje; return k ? u / k : null; }
+  function costoChip(v) {
+    if (!v.costo) return '';
+    var n = nivelGasto(v.costo.unidades), p = pctLimite(v.costo.unidades);
+    return ' · <span class="fact ' + n[1] + '" title="' + esc(v.costo.motivo) + '">Complejidad ' + esc(v.costo.complejidad) + '</span> <span class="fact ' + n[1] + '">Gasto ' + n[0] + (v.costo.estimado ? ' (est.)' : '') + (p != null ? ' · ' + nf(p, 1) + ' % del límite' : '') + '</span>';
+  }
+  function costoBloque(v) {
+    var c = v.costo, id = v.id;
+    if (!c && D.publico) return '';
+    if (!c) return '<div><h4>Costo y complejidad</h4><p class="nota">Sin medir todavía. Se mide con el transcript de la sesión (ver aprendizaje/costo-por-video.md).</p></div>';
+    var n = nivelGasto(c.unidades), rel = PROM ? c.unidades / PROM : 1, p = pctLimite(c.unidades);
+    var puntos = '●●●●●'.slice(0, c.puntos) + '○○○○○'.slice(0, 5 - c.puntos);
+    var imp = S.impacto[id] || '', impN = parseFloat(String(imp).replace(/\./g, '').replace(',', '.'));
+    var rend = isFinite(impN) && impN > 0 ? nf(impN / c.unidades, 1) + ' de impacto por cada millón de unidades gastadas' : 'Anota tu impacto y verás el rendimiento.';
+    return '<div><h4>Costo y complejidad</h4>' +
+      '<p><span class="fact ' + n[1] + '">Complejidad ' + esc(c.complejidad) + ' ' + puntos + '</span> <span class="fact ' + n[1] + '">Gasto ' + n[0] + '</span></p>' +
+      '<p class="nota" style="margin-top:8px">' + esc(c.motivo) + '</p>' +
+      '<div class="metricas" style="margin-top:8px">' + nf(c.unidades) + ' M unidades' + (c.estimado ? ' (promedio de 3 videos)' : '') + ' · ' + nf(rel, 1) + '× el promedio · ' + nf(100 * c.unidades / TOTALCO, 0) + ' % del gasto de los ' + COV.length + ' videos medidos · modelo ' + esc(c.modelo) + '</div>' +
+      '<p class="nota" style="margin-top:6px">% del límite de 5 h: ' + (p != null ? '<b>' + nf(p, 1) + ' %</b>' : 'sin calibrar (el límite no se puede leer desde aquí; ver nota abajo)') + '</p>' +
+      '<p class="nota">' + esc(c.reutil) + '</p></div>' +
+      '<div><h4>Impacto y rendimiento</h4><label><span class="nota">Impacto que mides (vistas, me gusta, clientes… un número)</span><input type="text" id="impacto" data-id="' + esc(id) + '" inputmode="decimal" placeholder="Ej.: 12500" value="' + esc(imp) + '"></label>' +
+      '<p id="rend" style="margin-top:8px"><b>' + rend + '</b></p>' +
+      '<p class="nota" style="margin-top:6px">' + esc(CO.nota || '') + '</p></div>';
+  }
+  var VAL = { ok: 'Me gusta', pulir: 'Pulir', no: 'No me gusta' };
+  function tarjetaMio(v) {
+    var val = S.valor[v.id] ? '<span class="estrella" style="background:var(--panel2);color:var(--texto);border:1px solid var(--borde)">' + esc(VAL[S.valor[v.id]]) + '</span>' : '';
+    return '<button class="tarjeta" data-mio="' + esc(v.id) + '"><div class="poster"><img loading="lazy" src="' + esc(v.poster) + '" alt=""><div class="play"><span></span></div>' + val + '</div>' +
+      '<div class="cuerpo"><h3>' + esc(v.titulo) + '</h3><div class="cuenta">' + esc(v.tipo) + '</div>' +
+      '<div class="metricas">' + esc(Math.round(v.duracion) + ' s' + (v.voz ? ' · voz ' + v.voz : '') + (v.lufs != null ? ' · ' + v.lufs + ' LUFS' : '')) + costoChip(v) + '</div></div></button>';
+  }
+  function pintaMios() {
+    return '<h2 class="sec">Videos generados en el taller</h2><div class="grid">' + D.mios.map(tarjetaMio).join('') + '</div>' +
+      '<p class="nota" style="margin-top:16px">Toca uno para verlo y dejar tu opinión: queda guardada en este navegador y se copia en “Mi elección”.</p>';
+  }
+
+  /* ---------- mi elección ---------- */
+  function mensaje() {
+    var l = [];
+    var v = S.estV.map(function (i) { return i + ' (' + V[i].nombre + ')'; }).join(' + ');
+    var n = S.estN.map(function (i) { return i + ' (' + N[i].nombre + ')'; }).join(' + ');
+    l.push('Quiero un video con estilo visual: ' + (v || '(sin elegir)') + ' y narrativa: ' + (n || '(sin elegir)') + '.');
+    if (S.favs.length) l.push('Referencias que me gustan: ' + S.favs.map(function (i) { return RID[i] ? RID[i].titulo + ' (' + RID[i].cuenta + ')' : i; }).join('; ') + '.');
+    l.push(S.tema ? 'Tema: ' + S.tema + '.' : 'Tema: sin definir (pregúntame).');
+    if (!S.voz.principal && !S.voz.segunda) l.push('Voz: voz no seleccionada (pregúntame cuál usar).');
+    else l.push('Voz: ' + (S.voz.principal ? 'principal ' + nombreVoz(S.voz.principal) : '') + (S.voz.segunda ? (S.voz.principal ? '; ' : '') + 'segunda (diálogo) ' + nombreVoz(S.voz.segunda) : '') + '.');
+    l.push(S.dur ? 'Duración: ' + S.dur + ' segundos.' : 'Duración: no seleccionada (pregúntame cuál usar).');
+    var op = D.mios.filter(function (x) { return S.valor[x.id] || S.notas[x.id]; }).map(function (x) { return '- ' + x.titulo + ': ' + (VAL[S.valor[x.id]] || 'sin valorar') + (S.notas[x.id] ? ' — ' + S.notas[x.id] : ''); });
+    if (op.length) l.push('Opinión sobre los videos hechos:\n' + op.join('\n'));
+    if (S.extra) l.push('Notas: ' + S.extra);
+    return l.join('\n');
+  }
+  function pintaEleccion() {
+    var combo = (S.estV.length || S.estN.length);
+    return '<div class="dos"><div class="panel" style="display:grid;gap:12px"><h2 class="sec" style="margin:0">Tu elección</h2>' +
+      '<div><h4 class="nota">Visual</h4><div class="tags">' + (S.estV.length ? S.estV.map(function (i) { return tagHTML(V[i]); }).join('') : '<span class="nota">Sin elegir (pestaña Estilos).</span>') + '</div></div>' +
+      '<div><h4 class="nota">Narrativa</h4><div class="tags">' + (S.estN.length ? S.estN.map(function (i) { return tagHTML(N[i]); }).join('') : '<span class="nota">Sin elegir.</span>') + '</div></div>' +
+      '<div><h4 class="nota">Referencias que te gustan</h4><div class="mini">' + (S.favs.length ? S.favs.map(function (i) { return RID[i] ? '<button data-ref="' + esc(i) + '" title="' + esc(RID[i].titulo) + '"><img src="' + esc(RID[i].poster) + '" alt=""></button>' : ''; }).join('') : '<span class="nota">Ninguna todavía.</span>') + '</div></div>' +
+      '<div><h4 class="nota">Voz</h4><div class="tags">' + (S.voz.principal || S.voz.segunda ? vocesElegidasHTML() : '<span class="tag" style="opacity:.75">Voz no seleccionada (pestaña Voces)</span>') + '</div></div>' +
+      '<label><span class="nota">Duración</span><select id="dur"><option value="">Duración no seleccionada</option>' + [15, 30, 45, 60, 90].map(function (d) { return '<option value="' + d + '"' + (String(S.dur) === String(d) ? ' selected' : '') + '>' + d + ' segundos</option>'; }).join('') + '</select></label>' +
+      '<label><span class="nota">Tema del video</span><input type="text" id="tema" placeholder="Ej.: por qué los micros de Lima tienen esos colores" value="' + esc(S.tema) + '"></label>' +
+      '<label><span class="nota">Notas</span><textarea id="extra" placeholder="Cosas que quieres o que no (la voz y la duración van arriba)">' + esc(S.extra) + '</textarea></label></div>' +
+      '<div class="panel" style="display:grid;gap:12px;align-content:start"><h2 class="sec" style="margin:0">Mensaje para pegarme</h2>' +
+      '<p class="nota">' + (D.publico ? 'Copia este texto y mándaselo a Francisco: dice qué estilo, voz y duración quieres.' : 'Copia este texto y pégalo en el chat cuando quieras el video: me dice qué estilo usar.') + '</p>' +
+      '<textarea id="msg" readonly style="min-height:220px">' + esc(mensaje()) + '</textarea>' +
+      '<div class="acciones"><button class="btn primario" id="copiar">Copiar mensaje</button><button class="btn" id="limpiar">Borrar mi elección</button></div><div class="nota" id="aviso"></div></div></div>';
+  }
+
+  /* ---------- modal ---------- */
+  var velo = document.getElementById('velo'), modal = document.getElementById('modal');
+  function abre(html, cls) { modal.className = 'modal' + (cls ? ' ' + cls : ''); modal.innerHTML = html; velo.classList.add('abierto'); document.body.style.overflow = 'hidden'; }
+  function cierra() { var v = modal.querySelector('video'); if (v) { v.pause(); v.removeAttribute('src'); v.load(); } modal.innerHTML = ''; velo.classList.remove('abierto'); document.body.style.overflow = ''; }
+  document.getElementById('cerrar').addEventListener('click', cierra);
+  velo.addEventListener('click', function (e) { if (e.target === velo) cierra(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && velo.classList.contains('abierto')) cierra(); });
+
+  function modalRef(id) {
+    var r = RID[id]; if (!r) return;
+    var fav = S.favs.indexOf(id) >= 0;
+    var tags = r.visual.map(function (i) { return tagHTML(V[i]); }).concat(r.narrativa.map(function (i) { return tagHTML(N[i]); })).join('');
+    var m = metricas(r.metricas).join(' · ');
+    var fact = V[r.visual[0]].factibilidad;
+    var cls = fact.indexOf('alta') === 0 ? 'alta' : fact.indexOf('media') === 0 ? 'media' : 'baja';
+    abre('<div class="izq">' + (r.video ? '<video controls playsinline preload="metadata" poster="' + esc(r.poster) + '" src="' + esc(r.video) + '"></video>' : '<a href="' + esc(r.url) + '" target="_blank" rel="noopener"><img src="' + esc(r.poster) + '" alt="" style="width:100%;display:block"></a><p class="nota" style="margin-top:8px">Míralo en el original (botón “Ver original”).</p>') + '</div>' +
+      '<div class="der"><div><h2>' + esc(r.titulo) + '</h2><div class="cuenta">' + esc(r.cuenta) + ' · ' + esc(r.plataforma) + (r.idioma === 'en' ? ' · en inglés' : '') + (r.metricas.fecha ? ' · ' + esc(r.metricas.fecha) : '') + '</div></div>' +
+      '<div class="tags">' + tags + '</div><div class="metricas">' + esc(m) + '</div>' +
+      '<div class="acciones"><button class="btn primario" data-fav="' + esc(id) + '" aria-pressed="' + fav + '">' + (fav ? '★ Me gusta' : '☆ Me gusta esta referencia') + '</button>' +
+      '<button class="btn" data-usar="' + esc(id) + '">Usar su estilo</button><a class="btn" href="' + esc(r.url) + '" target="_blank" rel="noopener">Ver original</a></div>' +
+      '<div><h4>De qué trata</h4><p>' + esc(r.resumen) + '</p></div>' +
+      '<div><h4>Gancho</h4><p>' + esc(r.gancho) + '</p></div><div><h4>Cierre</h4><p>' + esc(r.cierre) + '</p></div>' +
+      '<div><h4>Recursos que usa</h4><ul>' + r.recursos.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
+      '<div><h4>Para nosotros</h4><p><span class="fact ' + cls + '">Factibilidad ' + esc(fact) + '</span> ' + esc(r.encaje) + '</p></div>' +
+      (r.plancha ? '<div><h4>Fotogramas (uno cada ' + esc(r.metricas.pasoPlancha || '') + ' s)</h4><a href="' + esc(r.plancha) + '" target="_blank"><img class="plancha" loading="lazy" src="' + esc(r.plancha) + '" alt="Plancha de fotogramas"></a></div>' : '') +
+      (r.metricas.texto ? '<div><h4>Lo que dice (transcripción automática)</h4><div class="texto-mono">' + esc(r.metricas.texto) + '</div></div>' : '') + '</div>', esH(r) ? 'horiz' : '');
+  }
+  function modalMio(id) {
+    var v = D.mios.filter(function (x) { return x.id === id; })[0]; if (!v) return;
+    var val = S.valor[id] || '';
+    abre('<div class="izq"><video controls playsinline preload="metadata" poster="' + esc(v.poster) + '" src="' + esc(v.video) + '"></video></div>' +
+      '<div class="der"><div><h2>' + esc(v.titulo) + '</h2><div class="cuenta">' + esc(v.tipo) + '</div></div>' +
+      '<div class="metricas">' + esc(Math.round(v.duracion) + ' s · ' + v.ancho + '×' + v.alto + (v.voz ? ' · voz ' + v.voz : '') + (v.lufs != null ? ' · ' + v.lufs + ' LUFS' : '')) + '</div>' +
+      (v.resumen ? '<div><h4>De qué trata</h4><p>' + esc(v.resumen) + '</p></div>' : '') +
+      costoBloque(v) +
+      '<div><h4>Tu opinión</h4><div class="acciones">' + Object.keys(VAL).map(function (k) { return '<button class="btn" data-val="' + esc(id) + ':' + k + '" aria-pressed="' + (val === k) + '">' + VAL[k] + '</button>'; }).join('') + '</div></div>' +
+      '<div><h4>Qué cambiarías</h4><textarea id="nota-mio" data-id="' + esc(id) + '" placeholder="Voz, ritmo, encuadre, datos…">' + esc(S.notas[id] || '') + '</textarea></div>' +
+      (v.guion ? '<div class="nota">Guion y fuentes: ' + esc(v.guion) + '</div>' : '') + '</div>');
+  }
+
+  /* ---------- eventos ---------- */
+  var main = document.getElementById('main');
+  main.addEventListener('click', function (e) {
+    var t;
+    if ((t = e.target.closest('[data-fv]'))) { alterna(S.fV, t.getAttribute('data-fv')); pinta(); return; }
+    if ((t = e.target.closest('[data-fn]'))) { alterna(S.fN, t.getAttribute('data-fn')); pinta(); return; }
+    if ((t = e.target.closest('[data-voz-ocultar]'))) { var oid = t.getAttribute('data-voz-ocultar'); if (S.vocesOcultas.indexOf(oid) < 0) S.vocesOcultas.push(oid); if (S.voz.principal === oid) S.voz.principal = ''; if (S.voz.segunda === oid) S.voz.segunda = ''; guardar(); var sy1 = window.scrollY; pinta(); window.scrollTo(0, sy1); return; }
+    if ((t = e.target.closest('[data-voz-volver]'))) { var vid = t.getAttribute('data-voz-volver'); S.vocesOcultas = vid === '*' ? [] : S.vocesOcultas.filter(function (x) { return x !== vid; }); guardar(); var sy2 = window.scrollY; pinta(); window.scrollTo(0, sy2); return; }
+    if ((t = e.target.closest('[data-voz]'))) { var qv = t.getAttribute('data-voz').split(':'); S.voz[qv[0]] = S.voz[qv[0]] === qv[1] ? '' : qv[1]; guardar(); var sy = window.scrollY; pinta(); window.scrollTo(0, sy); return; }
+    if ((t = e.target.closest('[data-ref]'))) { modalRef(t.getAttribute('data-ref')); return; }
+    if ((t = e.target.closest('[data-mio]'))) { modalMio(t.getAttribute('data-mio')); return; }
+    if ((t = e.target.closest('[data-est]'))) { var p = t.getAttribute('data-est').split(':'); alterna(p[0] === 'v' ? S.estV : S.estN, p[1]); guardar(); pinta(); return; }
+    if (e.target.id === 'copiar') {
+      var txt = document.getElementById('msg').value, av = document.getElementById('aviso');
+      (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { av.textContent = 'Copiado.'; }, function () { var a = document.getElementById('msg'); a.select(); av.textContent = 'Selecciona el texto y copia con Ctrl+C.'; });
+      return;
+    }
+    if (e.target.id === 'limpiar') { S.voz = { principal: '', segunda: '' }; S.favs = []; S.estV = []; S.estN = []; S.tema = ''; S.dur = ''; S.extra = ''; S.notas = {}; S.valor = {}; guardar(); pinta(); }
+  });
+  main.addEventListener('input', function (e) {
+    if (e.target.id === 'tema') S.tema = e.target.value;
+    else if (e.target.id === 'extra') S.extra = e.target.value;
+    else if (e.target.id === 'dur') S.dur = e.target.value;
+    else return;
+    guardar(); var a = document.getElementById('msg'); if (a) a.value = mensaje();
+  });
+  modal.addEventListener('click', function (e) {
+    var t;
+    if ((t = e.target.closest('[data-fav]'))) { alterna(S.favs, t.getAttribute('data-fav')); guardar(); var id = t.getAttribute('data-fav'), pos = modal.querySelector('video').currentTime; modalRef(id); var vv = modal.querySelector('video'); vv.currentTime = pos; pintaTabs(); return; }
+    if ((t = e.target.closest('[data-usar]'))) { var r = RID[t.getAttribute('data-usar')]; S.estV = r.visual.slice(); S.estN = r.narrativa.slice(); guardar(); pintaTabs(); t.textContent = 'Estilo elegido ✓'; return; }
+    if ((t = e.target.closest('[data-val]'))) { var q = t.getAttribute('data-val').split(':'); S.valor[q[0]] = S.valor[q[0]] === q[1] ? '' : q[1]; guardar(); var pos2 = modal.querySelector('video').currentTime; modalMio(q[0]); modal.querySelector('video').currentTime = pos2; return; }
+  });
+  main.addEventListener('play', function (e) { if (e.target.tagName === 'AUDIO') document.querySelectorAll('audio').forEach(function (a) { if (a !== e.target) a.pause(); }); }, true);
+  modal.addEventListener('input', function (e) {
+    if (e.target.id === 'nota-mio') { S.notas[e.target.getAttribute('data-id')] = e.target.value; guardar(); }
+    else if (e.target.id === 'impacto') {
+      var vid = e.target.getAttribute('data-id'); S.impacto[vid] = e.target.value; guardar();
+      var vv = D.mios.filter(function (x) { return x.id === vid; })[0], r = document.getElementById('rend');
+      if (vv && r) { var n = parseFloat(String(e.target.value).replace(/\./g, '').replace(',', '.')); r.innerHTML = '<b>' + (isFinite(n) && n > 0 ? nf(n / vv.costo.unidades, 1) + ' de impacto por cada millón de unidades gastadas' : 'Anota tu impacto y verás el rendimiento.') + '</b>'; }
+    }
+  });
+  velo.addEventListener('click', function (e) { var t = e.target.closest('[data-ref]'); if (t && !modal.contains(t)) modalRef(t.getAttribute('data-ref')); });
+
+  function pinta() {
+    pintaTabs();
+    main.innerHTML = S.tab === 'refs' ? pintaRefs() : S.tab === 'estilos' ? pintaEstilos() : S.tab === 'voces' ? pintaVoces() : S.tab === 'mios' ? pintaMios() : pintaEleccion();
+  }
+  pinta();
+})();
+</script>
 </body>
 </html>
