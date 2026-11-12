@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Videos del taller</title>
+  <style>
+    :root { --fondo: #0f1117; --panel: #1a1d27; --texto: #eceef4; --suave: #9aa0b4; --acento: #f2b84b; }
+    @media (prefers-color-scheme: light) { :root { --fondo: #f5f4ef; --panel: #ffffff; --texto: #1b1d26; --suave: #5b6074; --acento: #b8791a; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--fondo); color: var(--texto); font-family: system-ui, "Segoe UI", sans-serif; }
+    main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 1.5rem; margin: 0 0 4px; }
+    .sub { color: var(--suave); margin: 0 0 24px; }
+    .rejilla { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    article { background: var(--panel); border-radius: 14px; padding: 12px; }
+    video { width: 100%; aspect-ratio: 9 / 16; background: #000; border-radius: 10px; }
+    h2 { font-size: 1rem; margin: 10px 0 4px; }
+    p { margin: 0; color: var(--suave); font-size: 0.85rem; }
+    footer { margin-top: 32px; color: var(--suave); font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Videos del taller</h1>
+    <p class="sub">Pruebas de video hechas con código e IA local. Toca uno para verlo.</p>
+    <div class="rejilla">
+      <article><video controls playsinline preload="none" poster="posters/video-1.jpg" src="videos/video-1.mp4"></video><h2>Glimmer Cape para supports (Dota 2)</h2><p>Animación 2D · 45 s</p></article>
+      <article><video controls playsinline preload="none" poster="posters/video-2.jpg" src="videos/video-2.mp4"></video><h2>Resumen: El Niño costero (12/11/2026)</h2><p>Animación plana con presentador · 30 s · datos del comunicado ENFEN N.° 19-2026</p></article>
+      <article><video controls playsinline preload="none" poster="posters/video-3.jpg" src="videos/video-3.mp4"></video><h2>¿Por qué en Lima hay tantos fierros saliendo de los techos?</h2><p>Explicativo 3D · 60 s</p></article>
+      <article><video controls playsinline preload="none" poster="posters/video-4.jpg" src="videos/video-4.mp4"></video><h2>Texto en movimiento (prueba)</h2><p>Primera prueba · 15 s · sin audio</p></article>
+    </div>
+    <footer>Pruebas de video hechas con código e IA local.</footer>
+  </main>
+</body>
+</html>
